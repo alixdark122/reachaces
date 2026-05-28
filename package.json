@@ -1,0 +1,14 @@
+{
+  "name": "ace-race-multi-user",
+  "version": "2.0.0",
+  "description": "Ace Race Kick Giveaway with Multi-User OAuth",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+ "dependencies": {
+  "dotenv": "^16.6.1",
+  "express": "^4.22.2",
+  "ws": "^8.21.0"
+}
+}
