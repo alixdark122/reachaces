@@ -47,7 +47,8 @@
         .participant-item:hover { background: rgba(25, 198, 253, 0.2); transform: translateX(4px); }
         .participant-item.selected-player1 { background: rgba(25, 198, 253, 0.3); border-left: 6px solid #19C6FD; }
         .participant-item.selected-player2 { background: rgba(25, 198, 253, 0.15); border-right: 6px solid #19C6FD; }
-        .participant-name { font-weight: 600; word-break: break-word; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+        .participant-name { font-weight: 600; word-break: break-word; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+        .participant-time { font-size: 0.7rem; opacity: 0.8; margin-left: 8px; white-space: nowrap; font-family: monospace; }
         .remove-participant { background: #dc2626; border: none; border-radius: 40px; padding: 2px 10px; color: white; cursor: pointer; font-size: 12px; transition: 0.2s; flex-shrink: 0; line-height: 1.4; }
         .remove-participant:hover { transform: scale(1.05); background: #ef4444; }
         .duel-players { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; }
@@ -56,9 +57,21 @@
         @keyframes cardGlow { 0% { box-shadow: 0 0 5px #19C6FD; } 50% { box-shadow: 0 0 25px #19C6FD, 0 0 10px #3b82f6; } 100% { box-shadow: 0 0 5px #19C6FD; } }
         .player-name { font-size: 1.5rem; font-weight: 800; font-family: 'Orbitron', monospace; background: linear-gradient(135deg, #19C6FD, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 16px; word-break: break-word; }
         .card-slot { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; min-height: 180px; display: flex; align-items: center; justify-content: center; }
-        .card-image { width: 110px; height: 154px; object-fit: contain; border-radius: 12px; background: white; box-shadow: 0 8px 20px rgba(0,0,0,0.3); animation: drawCard 0.4s cubic-bezier(0.2,0.9,0.4,1.1); }
+        .card-image { width: 110px; height: 154px; object-fit: contain; border-radius: 12px; background: #1e293b; box-shadow: 0 8px 20px rgba(0,0,0,0.3); animation: drawCard 0.4s cubic-bezier(0.2,0.9,0.4,1.1); transition: opacity 0.15s; }
+        .card-image.loading { opacity: 0.4; }
+        .card-image.loaded { opacity: 1; }
+        .card-back-img { width: 110px; height: 154px; object-fit: contain; border-radius: 12px; background: #1e293b; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
         .card-placeholder { width: 110px; height: 154px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 2px dashed #19C6FD; }
+        .card-placeholder.has-back { border: none; background: transparent; padding: 0; }
         @keyframes drawCard { 0% { opacity: 0; transform: translateY(-40px) rotate(-8deg); } 100% { opacity: 1; transform: translateY(0) rotate(0); } }
+        /* Card flip animation - now 0.5 seconds */
+        .card-flipper { perspective: 800px; width: 110px; height: 154px; }
+        .card-flipper-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s ease-in-out; transform-style: preserve-3d; }
+        .card-flipper-inner.flipped { transform: rotateY(180deg); }
+        .card-front, .card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; overflow: hidden; }
+        .card-front { transform: rotateY(180deg); }
+        .card-back { transform: rotateY(0deg); }
+
         .winner-badge { margin-top: 12px; font-size: 0.9rem; font-weight: 800; background: linear-gradient(135deg, #19C6FD, #3b82f6); color: white; padding: 6px 14px; border-radius: 60px; display: inline-block; animation: bouncePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
         @keyframes bouncePop { 0% { transform: scale(0); opacity: 0; } 80% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
         .controls { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
@@ -107,6 +120,33 @@
         .ready-cancel { text-align: center; margin-top: 10px; }
         .ready-cancel button { background: #334155; border: none; padding: 6px 20px; border-radius: 60px; font-weight: 600; cursor: pointer; color: #f1f5f9; }
         .start-ready-check { text-align: center; margin-top: 15px; }
+        .preset-card-panel { display: flex; gap: 8px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+        .preset-input { width: 80px; text-align: center; text-transform: uppercase; }
+        .preset-checkbox { width: 20px; height: 20px; margin-right: 4px; }
+        input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; border: 2px solid rgba(25, 198, 253, 0.4); border-radius: 6px; background: #0f172a; cursor: pointer; position: relative; transition: all 0.2s; vertical-align: middle; margin-right: 4px; flex-shrink: 0; }
+        input[type="checkbox"]:checked { background: linear-gradient(135deg, #19C6FD, #3b82f6); border-color: #19C6FD; box-shadow: 0 0 12px rgba(25, 198, 253, 0.4); }
+        input[type="checkbox"]:checked::after { content: "✓"; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 14px; font-weight: 800; }
+        input[type="checkbox"]:hover { border-color: #19C6FD; box-shadow: 0 0 8px rgba(25, 198, 253, 0.2); }
+        input[type="checkbox"]:disabled { opacity: 0.4; cursor: not-allowed; }
+        .preset-checkbox { width: auto; height: auto; border: none; background: none; margin-right: 0; vertical-align: baseline; }
+        .preset-checkbox:checked { background: none; box-shadow: none; }
+        .preset-checkbox:checked::after { display: none; }
+        /* Pick Card Overlay */
+        .pick-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 20000; cursor: default; }
+        .pick-container { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 48px; padding: 40px 50px; max-width: 550px; width: 90%; text-align: center; border: 2px solid #19C6FD; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .pick-crown { font-size: 3rem; margin-bottom: 10px; display: block; }
+        .pick-title { font-size: 1.8rem; font-weight: 800; color: #19C6FD; font-family: 'Orbitron', monospace; margin-bottom: 10px; }
+        .pick-player-name { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #19C6FD, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; font-family: 'Orbitron', monospace; margin-bottom: 20px; word-break: break-word; }
+        .pick-card-display { width: 120px; height: 168px; background: rgba(255,255,255,0.05); border-radius: 16px; border: 2px dashed #19C6FD; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 20px auto; transition: all 0.3s; }
+        .pick-card-display.filled { background: rgba(25,198,253,0.15); border: 2px solid #19C6FD; }
+        .pick-input-group { display: flex; gap: 12px; justify-content: center; margin-top: 15px; }
+        .pick-input-group input { width: 100px; padding: 12px 16px; border-radius: 60px; border: 2px solid rgba(25,198,253,0.4); background: #0f172a; color: white; font-size: 1.3rem; text-align: center; text-transform: uppercase; outline: none; font-weight: 700; letter-spacing: 2px; }
+        .pick-input-group input:focus { border-color: #19C6FD; box-shadow: 0 0 15px rgba(25,198,253,0.3); }
+        .pick-input-group button { padding: 12px 28px; border-radius: 60px; background: linear-gradient(135deg, #19C6FD, #3b82f6); border: none; font-weight: 700; font-size: 1.1rem; color: white; cursor: pointer; transition: 0.2s; }
+        .pick-input-group button:hover { transform: scale(1.05); }
+        .pick-feedback { margin-top: 15px; font-size: 0.9rem; min-height: 24px; }
+        .pick-feedback.success { color: #22c55e; }
+        .pick-feedback.error { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -161,12 +201,12 @@
                 <div class="duel-players">
                     <div class="player-card" id="player1Card">
                         <div class="player-name" id="p1Name">—</div>
-                        <div class="card-slot" id="p1CardSlot"><div class="card-placeholder">WAITING</div></div>
+                        <div class="card-slot" id="p1CardSlot"></div>
                         <div id="p1WinnerBadge"></div>
                     </div>
                     <div class="player-card" id="player2Card">
                         <div class="player-name" id="p2Name">—</div>
-                        <div class="card-slot" id="p2CardSlot"><div class="card-placeholder">WAITING</div></div>
+                        <div class="card-slot" id="p2CardSlot"></div>
                         <div id="p2WinnerBadge"></div>
                     </div>
                 </div>
@@ -176,6 +216,12 @@
                     <button id="resetDuelBtn" class="btn-secondary">Reset</button>
                     <button id="stopDrawBtn" class="btn-danger">Stop</button>
                     <button id="newDuelSameBtn" class="btn-success">New Duel</button>
+                </div>
+                <div class="preset-card-panel">
+                    <label><input type="checkbox" id="presetWinEnable" class="preset-checkbox"> Preset card</label>
+                    <input type="text" id="presetCardInput" class="input-field preset-input" placeholder="e.g., 5D" maxlength="3" disabled>
+                    <span id="presetBadge" style="display:none;font-size:0.75rem;font-weight:700;background:linear-gradient(135deg,#19C6FD,#3b82f6);color:white;padding:2px 10px;border-radius:60px;">🎯 </span>
+                    <label style="margin-left:12px;"><input type="checkbox" id="playerPicksEnable" class="preset-checkbox"> Player picks card</label>
                 </div>
                 <div class="deck-status" id="deckStatus">Deck: 0</div>
                 <div class="turn-indicator" id="turnStatus">No active duel</div>
@@ -199,24 +245,88 @@
     // ========== CARD ASSETS ==========
     const CARD_ASSET_PATH = "/assets/cards/";
     const CARD_EXT = ".png";
+    const CARD_BACK_URL = CARD_ASSET_PATH + "back.png?v=" + Date.now();
     function getCardImageUrl(rank, suitLetter) { return CARD_ASSET_PATH + rank + suitLetter + CARD_EXT; }
     const suitFull = { 'H': '♥', 'D': '♦', 'C': '♣', 'S': '♠' };
+    const allRanks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+    const allSuits = ['H', 'D', 'C', 'S'];
+    let cardBackAvailable = false;
+    (function preloadCardImages() {
+        for (const s of allSuits) for (const r of allRanks) { const img = new Image(); img.src = getCardImageUrl(r, s); }
+        const backImg = new Image();
+        backImg.onload = () => { cardBackAvailable = true; };
+        backImg.onerror = () => { cardBackAvailable = false; };
+        backImg.src = CARD_BACK_URL;
+    })();
 
-    // ========== AUDIO ==========
-    let audioContext = null;
+    // ========== AUDIO (custom sound files) ==========
+    let drawSound = null;
+    let flipSound = null;
+    function initAudio() {
+        // Initialize Audio objects only when needed (to respect autoplay policies)
+        if (!drawSound) {
+            drawSound = new Audio('/assets/sounds/draw.mp3');   // <-- put your draw sound here
+            drawSound.preload = 'auto';
+        }
+        if (!flipSound) {
+            flipSound = new Audio('/assets/sounds/flip.mp3');   // <-- put your flip sound here (optional)
+            flipSound.preload = 'auto';
+        }
+        // Also resume any previously suspended AudioContext (not needed for HTMLAudioElement)
+    }
     function playDrawSound() {
         try {
-            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioContext.state === 'suspended') audioContext.resume();
-            const now = audioContext.currentTime;
-            const o = audioContext.createOscillator();
-            const g = audioContext.createGain();
-            o.connect(g); g.connect(audioContext.destination);
-            o.frequency.value = 880;
-            g.gain.setValueAtTime(0.1, now);
-            g.gain.exponentialRampToValueAtTime(0.00001, now + 0.3);
-            o.start(now); o.stop(now + 0.2);
-        } catch (e) { /* no audio */ }
+            initAudio();
+            if (drawSound) {
+                drawSound.currentTime = 0;
+                drawSound.play().catch(e => console.log('Draw sound error:', e));
+            }
+        } catch (e) { /* silent fallback */ }
+    }
+    function playFlipSound() {
+        try {
+            initAudio();
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => console.log('Flip sound error:', e));
+            }
+        } catch (e) { /* silent */ }
+    }
+    function playDing() {
+        // keep the original ding (synthesized) for player selection – you can also replace with a file if you want
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') ctx.resume();
+            const now = ctx.currentTime;
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.connect(g); g.connect(ctx.destination);
+            o.frequency.value = 1318.52;
+            g.gain.setValueAtTime(0.15, now);
+            g.gain.exponentialRampToValueAtTime(0.00001, now + 0.4);
+            o.start(now); o.stop(now + 0.3);
+        } catch (e) { /* silent */ }
+    }
+    function playWheelSpinSound() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') ctx.resume();
+            const now = ctx.currentTime;
+            const bufferSize = 4096;
+            const noise = ctx.createScriptProcessor(bufferSize, 1, 1);
+            noise.onaudioprocess = function(e) {
+                const output = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() - 0.5) * 0.3;
+                noise.disconnect();
+            };
+            noise.connect(ctx.destination);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+            noise.connect(gain);
+            gain.connect(ctx.destination);
+            setTimeout(() => noise.disconnect(), 300);
+        } catch (e) { /* fallback */ }
     }
 
     // ========== STATE ==========
@@ -232,6 +342,11 @@
     let currentChannel = null;
     let isLoggedIn = false;
 
+    // Preset winning card
+    let presetWinEnabled = false;
+    let presetCardCode = '';
+    let playerPicksCard = false;
+
     // Auto-reconnect
     let reconnectTimer = null;
     let reconnectAttempt = 0;
@@ -246,6 +361,11 @@
     let readyTimerIntervals = [null, null];
     let currentWinnerOverlay = null;
     let currentWinnerName = null;
+
+    let stateDirty = false;
+    function markStateDirty() { stateDirty = true; }
+    setInterval(() => { if (stateDirty) { saveState(); stateDirty = false; } }, 2000);
+    let drawCount = 0;
 
     // DOM helpers
     const $ = id => document.getElementById(id);
@@ -281,6 +401,9 @@
     const modeIndicator = $('modeIndicator');
     const startReadyCheckContainer = $('startReadyCheckContainer');
     const startReadyCheckBtn = $('startReadyCheckBtn');
+    const presetWinEnable = $('presetWinEnable');
+    const presetCardInput = $('presetCardInput');
+    const playerPicksEnable = $('playerPicksEnable');
     const radioKeyword = document.querySelector('input[value="keyword"]');
     const radioActive = document.querySelector('input[value="active"]');
     const keywordSettingsDiv = $('keywordSettings');
@@ -291,6 +414,58 @@
         statusDisplay.className = 'connection-status ' + (status || 'disconnected');
     }
 
+    // ========== PRESET / CARD PICK HANDLERS ==========
+    function updatePresetBadge() {
+        const badge = $('presetBadge');
+        if (!badge) return;
+        if (presetWinEnabled && presetCardCode) {
+            badge.style.display = 'inline';
+            badge.textContent = '🎯 ' + presetCardCode;
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+    presetWinEnable.addEventListener('change', () => {
+        presetWinEnabled = presetWinEnable.checked;
+        presetCardInput.disabled = !presetWinEnabled;
+        if (presetWinEnabled) {
+            gameMessageSpan.innerText = 'Preset win card mode enabled. Set a card code (e.g., 5D).';
+        } else {
+            presetCardCode = '';
+            presetCardInput.value = '';
+            updatePresetBadge();
+            gameMessageSpan.innerText = 'Preset win card mode disabled.';
+            setTimeout(() => gameMessageSpan.innerText = 'Ready.', 2000);
+        }
+    });
+    presetCardInput.addEventListener('change', (e) => {
+        const val = e.target.value.toUpperCase().trim();
+        const match = val.match(/^([0-9]+|A|K|Q|J)([HDCS])$/);
+        if (match) {
+            presetCardCode = val; presetCardInput.value = val; updatePresetBadge();
+            gameMessageSpan.innerText = `✅ Preset winning card set to ${presetCardCode}`;
+        } else if (val === '') {
+            presetCardCode = ''; updatePresetBadge();
+            gameMessageSpan.innerText = 'Preset card cleared. Ace wins as usual.';
+        } else {
+            gameMessageSpan.innerText = '❌ Invalid card code. Use format like 5D, AH, KS, 10C';
+            e.target.value = presetCardCode || '';
+        }
+        setTimeout(() => { if (gameMessageSpan.innerText.includes('Preset') || gameMessageSpan.innerText.includes('Invalid')) gameMessageSpan.innerText = 'Ready.'; }, 2500);
+    });
+    presetCardInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') presetCardInput.dispatchEvent(new Event('change')); });
+
+    playerPicksEnable.addEventListener('change', () => {
+        playerPicksCard = playerPicksEnable.checked;
+        if (playerPicksCard) {
+            gameMessageSpan.innerText = '👑 Player picks card mode: After ready check, a player will choose the winning card.';
+        } else {
+            gameMessageSpan.innerText = 'Player picks card disabled.';
+        }
+        setTimeout(() => { if (gameMessageSpan.innerText.includes('Player picks')) gameMessageSpan.innerText = 'Ready.'; }, 2500);
+        markStateDirty();
+    });
+
     // ========== PERSISTENCE ==========
     function saveState() {
         if (!isLoggedIn) return;
@@ -298,7 +473,8 @@
             participants: participants.map(p => ({ name: p.name, id: p.id, lastSeen: p.lastSeen })),
             selectedPlayer1: selectedPlayer1 ? { name: selectedPlayer1.name, id: selectedPlayer1.id } : null,
             selectedPlayer2: selectedPlayer2 ? { name: selectedPlayer2.name, id: selectedPlayer2.id } : null,
-            currentMode, keyword, inactivityMinutes, kickToken, currentChannel, isLoggedIn
+            currentMode, keyword, inactivityMinutes, kickToken, currentChannel, isLoggedIn,
+            presetWinEnabled, presetCardCode, playerPicksCard
         }));
     }
 
@@ -317,20 +493,22 @@
             kickToken = s.kickToken;
             currentChannel = s.currentChannel;
             isLoggedIn = s.isLoggedIn;
+            if (s.presetWinEnabled !== undefined) presetWinEnabled = s.presetWinEnabled;
+            if (s.presetCardCode) presetCardCode = s.presetCardCode;
+            if (s.playerPicksCard !== undefined) playerPicksCard = s.playerPicksCard;
             if (currentChannel) channelNameInput.value = currentChannel;
             modeIndicator.innerText = keyword;
             keywordInput.value = keyword;
             inactivitySlider.value = inactivityMinutes;
             inactivityValue.innerText = inactivityMinutes;
+            presetWinEnable.checked = presetWinEnabled;
+            presetCardInput.disabled = !presetWinEnabled;
+            if (presetCardCode) { presetCardInput.value = presetCardCode; updatePresetBadge(); }
+            if (playerPicksEnable) playerPicksEnable.checked = playerPicksCard;
             if (currentMode === 'keyword') {
-                radioKeyword.checked = true;
-                keywordSettingsDiv.style.display = 'block';
-                activeSettingsDiv.style.display = 'none';
+                radioKeyword.checked = true; keywordSettingsDiv.style.display = 'block'; activeSettingsDiv.style.display = 'none';
             } else {
-                radioActive.checked = true;
-                keywordSettingsDiv.style.display = 'none';
-                activeSettingsDiv.style.display = 'block';
-                startInactivityChecker();
+                radioActive.checked = true; keywordSettingsDiv.style.display = 'none'; activeSettingsDiv.style.display = 'block'; startInactivityChecker();
             }
             if (isLoggedIn && currentChannel) {
                 userInfoArea.innerHTML = `<div class="user-info"><div class="user-details">Logged in as <strong>${currentChannel}</strong></div></div>`;
@@ -338,9 +516,7 @@
                 loginBtn.textContent = 'Disconnect';
                 startKickBrowserChat(currentChannel);
             }
-            renderParticipants();
-            updateSelectedDisplay();
-            resetGameVisualsOnly();
+            renderParticipants(); updateSelectedDisplay(); resetGameVisualsOnly();
         } catch (e) { console.warn('Load state error', e); }
     }
 
@@ -432,30 +608,20 @@
     function stopKickBrowserChat() {
         if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
         reconnectAttempt = 0;
-        if (kickBrowserSocket) {
-            try { kickBrowserSocket.close(); } catch (e) {}
-            kickBrowserSocket = null;
-        }
+        if (kickBrowserSocket) { try { kickBrowserSocket.close(); } catch (e) {} kickBrowserSocket = null; }
     }
 
     function handleChatMessage(username, content) {
         if (!username || !content) return;
         const kl = keyword.toLowerCase();
         if (currentMode === 'keyword') {
-            if (kl === '' || content.toLowerCase() === kl || content.toLowerCase().startsWith(kl + ' ')) {
-                addParticipant(username);
-            }
+            if (kl === '' || content.toLowerCase() === kl || content.toLowerCase().startsWith(kl + ' ')) addParticipant(username);
         } else {
-            if (!participants.some(p => p.name.toLowerCase() === username.toLowerCase())) {
-                addParticipant(username);
-            } else {
-                updateParticipantSeen(username);
-            }
+            if (!participants.some(p => p.name.toLowerCase() === username.toLowerCase())) addParticipant(username);
+            else updateParticipantSeen(username);
         }
         if (window._readyCheckCallback) window._readyCheckCallback(username, content);
-        if (currentWinnerOverlay && currentWinnerName === username) {
-            addLiveWinnerMessage(username, content);
-        }
+        if (currentWinnerOverlay && currentWinnerName === username) addLiveWinnerMessage(username, content);
     }
 
     async function startKickBrowserChat(channelName) {
@@ -520,62 +686,68 @@
         if (!isLoggedIn) { gameMessageSpan.innerText = 'Please log in first.'; return; }
         const channel = channelNameInput.value.trim();
         if (!channel) { gameMessageSpan.innerText = 'Enter a channel name.'; return; }
-        currentChannel = channel;
-        manualDisconnect = false;
-        startKickBrowserChat(currentChannel);
-        saveState();
+        currentChannel = channel; manualDisconnect = false;
+        startKickBrowserChat(currentChannel); saveState();
     });
+
+    // ========== TAB VISIBILITY FIX ==========
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        reconnectAttempt = 0;
+        if (currentChannel && isLoggedIn && !manualDisconnect) {
+            if (!kickBrowserSocket || kickBrowserSocket.readyState > 1) {
+                setConnectionStatus('🔄 Tab refocused, reconnecting...', 'reconnecting');
+                startKickBrowserChat(currentChannel);
+            }
+        }
+        if (isDuelActive && !duelWinner && deck.length > 0) {
+            if (drawTimeout) clearTimeout(drawTimeout);
+            drawTimeout = setTimeout(drawStep, 100);
+        }
+    });
+
+    // ========== LIVE TIMER ==========
+    setInterval(() => {
+        document.querySelectorAll('.participant-time[data-lastseen]').forEach(el => {
+            const ts = parseFloat(el.dataset.lastseen);
+            if (ts) el.textContent = '⏱️ ' + timeAgo(ts);
+        });
+    }, 1000);
 
     // ========== MODE ==========
     function applyMode() {
-        if (currentMode === 'active') {
-            startInactivityChecker();
-        } else {
-            if (inactivityInterval) { clearInterval(inactivityInterval); inactivityInterval = null; }
-        }
-        renderParticipants(); // refresh display
-        saveState();
+        if (currentMode === 'active') startInactivityChecker();
+        else if (inactivityInterval) { clearInterval(inactivityInterval); inactivityInterval = null; }
+        renderParticipants(); saveState();
     }
-
     radioKeyword.addEventListener('change', () => {
         if (!radioKeyword.checked) return;
-        currentMode = 'keyword';
-        keywordSettingsDiv.style.display = 'block';
-        activeSettingsDiv.style.display = 'none';
-        modeIndicator.innerText = keyword || '!ace';
-        applyMode();
+        currentMode = 'keyword'; keywordSettingsDiv.style.display = 'block'; activeSettingsDiv.style.display = 'none';
+        modeIndicator.innerText = keyword || '!ace'; applyMode();
     });
     radioActive.addEventListener('change', () => {
         if (!radioActive.checked) return;
-        currentMode = 'active';
-        keywordSettingsDiv.style.display = 'none';
-        activeSettingsDiv.style.display = 'block';
-        modeIndicator.innerText = 'any message (active chatter)';
-        applyMode();
+        currentMode = 'active'; keywordSettingsDiv.style.display = 'none'; activeSettingsDiv.style.display = 'block';
+        modeIndicator.innerText = 'any message (active chatter)'; applyMode();
     });
-
     keywordInput.addEventListener('input', (e) => { keyword = e.target.value.trim(); if (currentMode === 'keyword') modeIndicator.innerText = keyword || 'any message'; saveState(); });
     setKeywordBtn.addEventListener('click', () => {
         keyword = keywordInput.value.trim();
         if (currentMode === 'keyword') modeIndicator.innerText = keyword || 'any message';
         gameMessageSpan.innerText = `Keyword set to "${keyword}"`;
-        setTimeout(() => { if (gameMessageSpan.innerText.includes('Keyword set')) gameMessageSpan.innerText = 'Ready.'; }, 2000);
-        saveState();
+        setTimeout(() => { if (gameMessageSpan.innerText.includes('Keyword set')) gameMessageSpan.innerText = 'Ready.'; }, 2000); saveState();
     });
     inactivitySlider.addEventListener('input', (e) => {
-        inactivityMinutes = parseFloat(e.target.value);
-        inactivityValue.innerText = inactivityMinutes;
-        if (currentMode === 'active') startInactivityChecker();
-        saveState();
+        inactivityMinutes = parseFloat(e.target.value); inactivityValue.innerText = inactivityMinutes;
+        if (currentMode === 'active') startInactivityChecker(); saveState();
     });
 
-    // ========== INACTIVITY CHECKER (removes inactive participants, no display) ==========
+    // ========== INACTIVITY CHECKER ==========
     function startInactivityChecker() {
         if (inactivityInterval) clearInterval(inactivityInterval);
         inactivityInterval = setInterval(() => {
-            if (currentMode !== 'active' || isDuelActive) return;
-            const now = Date.now();
-            const timeoutMs = inactivityMinutes * 60 * 1000;
+            if (currentMode !== 'active') return;
+            const now = Date.now(); const timeoutMs = inactivityMinutes * 60 * 1000;
             let removed = false;
             const newParticipants = participants.filter(p => {
                 if ((selectedPlayer1 && selectedPlayer1.id === p.id) || (selectedPlayer2 && selectedPlayer2.id === p.id)) return true;
@@ -586,12 +758,9 @@
                 participants = newParticipants;
                 if (selectedPlayer1 && !participants.some(p => p.id === selectedPlayer1.id)) selectedPlayer1 = null;
                 if (selectedPlayer2 && !participants.some(p => p.id === selectedPlayer2.id)) selectedPlayer2 = null;
-                renderParticipants(); // re-render because structure changed
-                updateSelectedDisplay();
-                resetGameVisualsOnly();
+                renderParticipants(); updateSelectedDisplay(); resetGameVisualsOnly();
                 gameMessageSpan.innerText = "Inactive participants removed";
-                setTimeout(() => { if (gameMessageSpan.innerText === "Inactive participants removed") gameMessageSpan.innerText = 'Ready.'; }, 3000);
-                saveState();
+                setTimeout(() => { if (gameMessageSpan.innerText === "Inactive participants removed") gameMessageSpan.innerText = 'Ready.'; }, 3000); saveState();
             }
         }, 5000);
     }
@@ -605,8 +774,7 @@
         if (placeholder) placeholder.remove();
         const div = document.createElement('div');
         div.innerHTML = `${new Date().toLocaleTimeString()} : ${escapeHtml(message)}`;
-        logDiv.appendChild(div);
-        logDiv.scrollTop = logDiv.scrollHeight;
+        logDiv.appendChild(div); logDiv.scrollTop = logDiv.scrollHeight;
     }
 
     function showWinnerOverlay(winnerName, winnerMessages) {
@@ -622,42 +790,90 @@
                 <button id="closeWinnerBtn">Continue</button>
             </div>`;
         document.body.appendChild(overlay);
-        currentWinnerOverlay = overlay;
-        currentWinnerName = winnerName;
+        currentWinnerOverlay = overlay; currentWinnerName = winnerName;
         const close = () => { overlay.remove(); currentWinnerOverlay = null; currentWinnerName = null; };
         overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
         $('closeWinnerBtn').addEventListener('click', close);
     }
 
     function shootConfettiPiece() {
-        const c = document.createElement('div');
-        c.className = 'confetti-piece';
+        const c = document.createElement('div'); c.className = 'confetti-piece';
         c.style.cssText = `left:${Math.random()*window.innerWidth}px;top:-20px;background:hsl(${Math.random()*360},80%,60%);width:${Math.random()*10+4}px;height:${Math.random()*10+4}px;border-radius:${Math.random()>.5?'50%':'0'}`;
         document.body.appendChild(c);
-        c.animate([
-            { transform: 'translateY(0px) rotate(0deg)', opacity: 1 },
-            { transform: `translateY(${window.innerHeight+100}px) rotate(${Math.random()*360}deg)`, opacity: 0 }
-        ], { duration: 1500 + Math.random() * 1000, easing: 'cubic-bezier(0.2,0.9,0.4,1)' }).onfinish = () => c.remove();
+        c.animate([{ transform: 'translateY(0px) rotate(0deg)', opacity: 1 }, { transform: `translateY(${window.innerHeight+100}px) rotate(${Math.random()*360}deg)`, opacity: 0 }], { duration: 1500 + Math.random() * 1000, easing: 'cubic-bezier(0.2,0.9,0.4,1)' }).onfinish = () => c.remove();
     }
     function shootConfetti() { for (let i = 0; i < 100; i++) setTimeout(shootConfettiPiece, i * 15); }
 
-    // ========== PARTICIPANTS (no timers displayed) ==========
+    // ========== PARTICIPANTS ==========
     function addParticipant(username, timestamp) {
         const name = username.trim();
         if (!name || participants.some(p => p.name.toLowerCase() === name.toLowerCase())) return false;
-        participants.push({ name, id: Date.now() + Math.random(), lastSeen: timestamp || Date.now() });
-        renderParticipants();
-        saveState();
-        return true;
+        const id = Date.now() + Math.random();
+        const lastSeen = timestamp || Date.now();
+        participants.push({ name, id, lastSeen });
+        const isP1 = selectedPlayer1 && selectedPlayer1.id === id;
+        const isP2 = selectedPlayer2 && selectedPlayer2.id === id;
+        const cls = isP1 ? 'selected-player1' : isP2 ? 'selected-player2' : '';
+        const timeHtml = (currentMode === 'active' && !isP1 && !isP2) ? `<span class="participant-time" data-lastseen="${lastSeen}">⏱️ ${timeAgo(lastSeen)}</span>` : (isP1 || isP2 ? `<span class="participant-time">🛡️ Protected</span>` : '');
+        const div = document.createElement('div');
+        div.className = `participant-item ${cls}`;
+        div.setAttribute('data-id', id);
+        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="participant-name">${escapeHtml(name)}</span>${timeHtml}</div><div><button class="remove-participant" data-id="${id}">✖</button></div>`;
+        participantListDiv.appendChild(div);
+        attachParticipantEvents(div);
+        participantCountSpan.innerText = participants.length;
+        markStateDirty(); return true;
     }
 
     function updateParticipantSeen(name) {
         const p = participants.find(p => p.name.toLowerCase() === name.toLowerCase());
-        if (p) {
-            p.lastSeen = Date.now();
-            // No re-render needed for display because we don't show any timer
-            saveState();
+        if (!p) return;
+        p.lastSeen = Date.now();
+        const item = participantListDiv.querySelector(`.participant-item[data-id="${p.id}"]`);
+        if (item && currentMode === 'active') {
+            const timeSpan = item.querySelector('.participant-time');
+            if (timeSpan && timeSpan.dataset.lastseen) { timeSpan.dataset.lastseen = p.lastSeen; timeSpan.textContent = `⏱️ ${timeAgo(p.lastSeen)}`; }
         }
+        markStateDirty();
+    }
+
+    function attachParticipantEvents(div) {
+        const removeBtn = div.querySelector('.remove-participant');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseFloat(removeBtn.getAttribute('data-id'));
+                participants = participants.filter(p => p.id !== id);
+                if (selectedPlayer1 && selectedPlayer1.id === id) selectedPlayer1 = null;
+                if (selectedPlayer2 && selectedPlayer2.id === id) selectedPlayer2 = null;
+                div.remove(); participantCountSpan.innerText = participants.length;
+                updateSelectedDisplay(); resetGameVisualsOnly();
+                startReadyCheckContainer.style.display = (selectedPlayer1 && selectedPlayer2) ? 'block' : 'none';
+                markStateDirty();
+            });
+        }
+        div.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-participant')) return;
+            const id = parseFloat(div.getAttribute('data-id'));
+            const p = participants.find(x => x.id === id);
+            if (!p) return;
+            if (!selectedPlayer1) { selectedPlayer1 = p; gameMessageSpan.innerText = `${p.name} selected as Player 1`; playDing(); }
+            else if (!selectedPlayer2 && selectedPlayer1.id !== p.id) { selectedPlayer2 = p; gameMessageSpan.innerText = `${p.name} selected as Player 2`; playDing(); }
+            else if (selectedPlayer1.id === p.id) { selectedPlayer1 = null; gameMessageSpan.innerText = 'Player 1 deselected'; }
+            else if (selectedPlayer2 && selectedPlayer2.id === p.id) { selectedPlayer2 = null; gameMessageSpan.innerText = 'Player 2 deselected'; }
+            else { gameMessageSpan.innerText = 'Already have two players. Deselect one first.'; }
+            updateSelectedDisplay(); renderParticipants();
+            startReadyCheckContainer.style.display = (selectedPlayer1 && selectedPlayer2) ? 'block' : 'none';
+            markStateDirty();
+        });
+    }
+
+    function timeAgo(timestamp) {
+        const seconds = Math.floor((Date.now() - timestamp) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}m ${remainingSeconds}s ago`;
     }
 
     function renderParticipants() {
@@ -666,46 +882,15 @@
             const isP1 = selectedPlayer1 && selectedPlayer1.id === p.id;
             const isP2 = selectedPlayer2 && selectedPlayer2.id === p.id;
             const cls = isP1 ? 'selected-player1' : isP2 ? 'selected-player2' : '';
-            // No time display at all – only name and remove button
+            const lastSeen = p.lastSeen || Date.now();
+            const timeHtml = (currentMode === 'active' && !isP1 && !isP2) ? `<span class="participant-time" data-lastseen="${lastSeen}">⏱️ ${timeAgo(lastSeen)}</span>` : (isP1 || isP2 ? `<span class="participant-time">🛡️ Protected</span>` : '');
             const div = document.createElement('div');
             div.className = `participant-item ${cls}`;
             div.setAttribute('data-id', p.id);
-            div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="participant-name">${escapeHtml(p.name)}</span></div><div><button class="remove-participant" data-id="${p.id}">✖</button></div>`;
-            participantListDiv.appendChild(div);
+            div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="participant-name">${escapeHtml(p.name)}</span>${timeHtml}</div><div><button class="remove-participant" data-id="${p.id}">✖</button></div>`;
+            participantListDiv.appendChild(div); attachParticipantEvents(div);
         });
         participantCountSpan.innerText = participants.length;
-
-        // Remove button handlers
-        participantListDiv.querySelectorAll('.remove-participant').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseFloat(btn.getAttribute('data-id'));
-                participants = participants.filter(p => p.id !== id);
-                if (selectedPlayer1 && selectedPlayer1.id === id) selectedPlayer1 = null;
-                if (selectedPlayer2 && selectedPlayer2.id === id) selectedPlayer2 = null;
-                renderParticipants(); updateSelectedDisplay(); resetGameVisualsOnly();
-                startReadyCheckContainer.style.display = (selectedPlayer1 && selectedPlayer2) ? 'block' : 'none';
-                saveState();
-            });
-        });
-
-        // Click to select
-        participantListDiv.querySelectorAll('.participant-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-participant')) return;
-                const id = parseFloat(item.getAttribute('data-id'));
-                const p = participants.find(x => x.id === id);
-                if (!p) return;
-                if (!selectedPlayer1) { selectedPlayer1 = p; gameMessageSpan.innerText = `${p.name} selected as Player 1`; }
-                else if (!selectedPlayer2 && selectedPlayer1.id !== p.id) { selectedPlayer2 = p; gameMessageSpan.innerText = `${p.name} selected as Player 2`; }
-                else if (selectedPlayer1.id === p.id) { selectedPlayer1 = null; gameMessageSpan.innerText = 'Player 1 deselected'; }
-                else if (selectedPlayer2 && selectedPlayer2.id === p.id) { selectedPlayer2 = null; gameMessageSpan.innerText = 'Player 2 deselected'; }
-                else { gameMessageSpan.innerText = 'Already have two players. Deselect one first.'; }
-                updateSelectedDisplay(); renderParticipants();
-                startReadyCheckContainer.style.display = (selectedPlayer1 && selectedPlayer2) ? 'block' : 'none';
-                saveState();
-            });
-        });
     }
 
     function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m] || m); }
@@ -716,7 +901,7 @@
             : 'No duelists. Click on participants or use "Pick Two Random".';
         p1NameSpan.innerText = selectedPlayer1 ? selectedPlayer1.name : "—";
         p2NameSpan.innerText = selectedPlayer2 ? selectedPlayer2.name : "—";
-        saveState();
+        markStateDirty();
     }
 
     // ========== WHEEL SELECTOR ==========
@@ -746,6 +931,7 @@
         void w1.offsetHeight; void w2.offsetHeight;
         w1.style.transform = `translateY(${-(idx1 * itemHeight) + centerOffset}px)`;
         w2.style.transform = `translateY(${-(idx2 * itemHeight) + centerOffset}px)`;
+        playWheelSpinSound();
         let stopped = 0;
         function onStop() {
             stopped++;
@@ -765,7 +951,7 @@
             gameMessageSpan.innerText = `Selected: ${p1.name} vs ${p2.name}`;
             startReadyCheckContainer.style.display = 'block';
             showReadyCheckOverlay(selectedPlayer1, selectedPlayer2);
-            saveState();
+            markStateDirty(); playDing();
         }
         w1.addEventListener('transitionend', onStop, { once: true });
         w2.addEventListener('transitionend', onStop, { once: true });
@@ -799,8 +985,7 @@
         readyOverlayElement = overlay;
 
         function startTimer(idx, secs) {
-            secs = secs || 30;
-            let left = secs;
+            secs = secs || 30; let left = secs;
             const te = $(`readyTimer${idx}`), be = $(`timerBar${idx}`);
             const iv = setInterval(() => {
                 if (!readyCheckActive) { clearInterval(iv); return; }
@@ -822,14 +1007,25 @@
         });
 
         const forceStartBtn = $('forceStartBtn'), startBattleBtn = $('startBattleBtn');
+
+        function proceedAfterReadyCheck() {
+            if (playerPicksCard) {
+                const pickIdx = Math.random() < 0.5 ? 0 : 1;
+                const picker = readyCheckPlayers[pickIdx];
+                showPickCardOverlay(picker);
+            } else {
+                selectedPlayer1 = readyCheckPlayers[0]; selectedPlayer2 = readyCheckPlayers[1];
+                updateSelectedDisplay(); resetGameVisualsOnly();
+                gameMessageSpan.innerText = 'Starting battle!';
+                startAceDuel(); markStateDirty();
+            }
+        }
+
         forceStartBtn.addEventListener('click', () => {
             readyCheckActive = false; overlay.remove();
             if (readyTimerIntervals[0]) clearInterval(readyTimerIntervals[0]);
             if (readyTimerIntervals[1]) clearInterval(readyTimerIntervals[1]);
-            selectedPlayer1 = readyCheckPlayers[0]; selectedPlayer2 = readyCheckPlayers[1];
-            updateSelectedDisplay(); resetGameVisualsOnly();
-            gameMessageSpan.innerText = 'Starting battle!';
-            startAceDuel(); saveState();
+            proceedAfterReadyCheck();
         });
 
         function replacePlayer(idx) {
@@ -871,19 +1067,105 @@
             readyCheckActive = false; overlay.remove();
             if (readyTimerIntervals[0]) clearInterval(readyTimerIntervals[0]);
             if (readyTimerIntervals[1]) clearInterval(readyTimerIntervals[1]);
-            selectedPlayer1 = readyCheckPlayers[0]; selectedPlayer2 = readyCheckPlayers[1];
-            updateSelectedDisplay(); resetGameVisualsOnly();
-            gameMessageSpan.innerText = 'Both players ready! Starting Ace Race...';
-            startAceDuel(); saveState();
+            proceedAfterReadyCheck();
         });
     }
 
-    // ========== DUEL ==========
+    // ========== PLAYER PICKS CARD OVERLAY ==========
+    let pickOverlayElement = null;
+
+    function showPickCardOverlay(picker) {
+        if (pickOverlayElement) pickOverlayElement.remove();
+        const overlay = document.createElement('div');
+        overlay.className = 'pick-overlay';
+        overlay.innerHTML = `
+            <div class="pick-container">
+                <span class="pick-crown">👑</span>
+                <div class="pick-title">Player Picks the Winning Card!</div>
+                <div class="pick-player-name">${escapeHtml(picker.name)}</div>
+                <div style="color:#94a3b8;font-size:0.95rem;">Type the winning card and confirm.</div>
+                <div class="pick-card-display" id="pickCardDisplay">?</div>
+                <div class="pick-input-group">
+                    <input type="text" id="pickCardInput" placeholder="e.g., 7D" maxlength="3" autofocus>
+                    <button id="pickConfirmBtn">Confirm</button>
+                </div>
+                <div id="pickFeedback" class="pick-feedback"></div>
+            </div>`;
+        document.body.appendChild(overlay);
+        pickOverlayElement = overlay;
+
+        const input = $('pickCardInput');
+        const feedback = $('pickFeedback');
+        const display = $('pickCardDisplay');
+        const confirmBtn = $('pickConfirmBtn');
+
+        function loadCardImage(rank, suitLetter) {
+            display.innerHTML = '';
+            display.className = 'pick-card-display filled';
+            const img = new Image();
+            img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:14px;background:#1e293b;';
+            img.onload = function() { display.innerHTML = ''; display.appendChild(img); };
+            img.onerror = function() { display.textContent = rank + suitFull[suitLetter]; };
+            img.src = getCardImageUrl(rank, suitLetter);
+        }
+
+        input.addEventListener('input', () => {
+            let val = input.value.toUpperCase().trim();
+            const match = val.match(/^([0-9]+|A|K|Q|J)([HDCS])$/);
+            if (match) {
+                loadCardImage(match[1], match[2]);
+            } else if (val === '') {
+                display.innerHTML = '?';
+                display.className = 'pick-card-display';
+            } else {
+                display.innerHTML = val;
+                display.className = 'pick-card-display';
+            }
+            feedback.className = 'pick-feedback';
+            feedback.textContent = '';
+        });
+
+        function confirmCard() {
+            let val = input.value.toUpperCase().trim();
+            const match = val.match(/^([0-9]+|A|K|Q|J)([HDCS])$/);
+            if (!match) {
+                feedback.className = 'pick-feedback error';
+                feedback.textContent = '❌ Invalid format. Use e.g. 5D, AH, KS, 10C';
+                return;
+            }
+            feedback.className = 'pick-feedback success';
+            feedback.textContent = '✅ Card confirmed! Starting duel...';
+            loadCardImage(match[1], match[2]);
+            input.disabled = true;
+            confirmBtn.disabled = true;
+
+            presetCardCode = val;
+            presetWinEnabled = true;
+            presetWinEnable.checked = true;
+            presetCardInput.value = val;
+            presetCardInput.disabled = false;
+            updatePresetBadge();
+
+            setTimeout(() => {
+                overlay.remove();
+                pickOverlayElement = null;
+                selectedPlayer1 = readyCheckPlayers[0];
+                selectedPlayer2 = readyCheckPlayers[1];
+                updateSelectedDisplay(); resetGameVisualsOnly();
+                gameMessageSpan.innerText = `Winning card: ${val}! Starting duel...`;
+                startAceDuel(); markStateDirty();
+            }, 1200);
+        }
+
+        confirmBtn.addEventListener('click', confirmCard);
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmCard(); });
+        input.focus();
+    }
+
+    // ========== DUEL with custom flip sound and 0.5s flip ==========
     function buildAndShuffleDeck() {
-        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        const suits = ['H', 'D', 'C', 'S'];
         let d = [];
-        for (const s of suits) for (const r of ranks) d.push({ rank: r, suitLetter: s, display: r + suitFull[s] });
+        for (const s of allSuits) for (const r of allRanks) d.push({ rank: r, suitLetter: s, display: r + suitFull[s], code: r + s });
         for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
         return d;
     }
@@ -891,8 +1173,8 @@
     function resetGameVisualsOnly() {
         if (drawTimeout) clearTimeout(drawTimeout);
         isDuelActive = false; duelWinner = null; currentTurn = 0; deck = [];
-        p1CardSlot.innerHTML = '<div class="card-placeholder">WAITING</div>';
-        p2CardSlot.innerHTML = '<div class="card-placeholder">WAITING</div>';
+        showCardBack(p1CardSlot);
+        showCardBack(p2CardSlot);
         p1WinnerBadge.innerHTML = ''; p2WinnerBadge.innerHTML = '';
         turnStatusSpan.innerText = 'No active duel'; deckStatusSpan.innerText = 'Deck: 0';
         gameMessageSpan.innerText = 'Ready.';
@@ -901,67 +1183,107 @@
 
     function stopDrawingAndResetGame() { if (drawTimeout) clearTimeout(drawTimeout); isDuelActive = false; duelWinner = null; }
 
+    function showCardBack(slot) {
+        if (cardBackAvailable) {
+            slot.innerHTML = `<img class="card-back-img" src="${CARD_BACK_URL}" alt="card back">`;
+        } else {
+            slot.innerHTML = '<div class="card-placeholder">🂠</div>';
+        }
+    }
+
     function renderCardToSlot(slot, card) {
         if (!card) { slot.innerHTML = '<div class="card-placeholder">NO CARD</div>'; return; }
-        const img = document.createElement('img');
-        img.className = 'card-image';
-        img.src = getCardImageUrl(card.rank, card.suitLetter);
-        img.alt = card.display;
-        img.onerror = function () {
-            img.style.display = 'none';
-            slot.innerHTML = `<div class="card-placeholder">${card.display}</div>`;
-        };
         slot.innerHTML = '';
-        slot.appendChild(img);
+        const flipper = document.createElement('div');
+        flipper.className = 'card-flipper';
+        flipper.innerHTML = `
+            <div class="card-flipper-inner">
+                <div class="card-back">${cardBackAvailable ? `<img class="card-back-img" src="${CARD_BACK_URL}" alt="back">` : '<div class="card-placeholder" style="border:none;background:transparent;">🂠</div>'}</div>
+                <div class="card-front"><div class="card-placeholder">${card.display}</div></div>
+            </div>`;
+        slot.appendChild(flipper);
+        const inner = flipper.querySelector('.card-flipper-inner');
+        const img = new Image();
+        img.className = 'card-image loaded';
+        img.alt = card.display;
+        img.style.cssText = 'width:100%;height:100%;object-fit:contain;border-radius:12px;background:#1e293b;';
+        img.onload = function () {
+            const front = inner.querySelector('.card-front');
+            front.innerHTML = '';
+            front.appendChild(img);
+            requestAnimationFrame(() => {
+                inner.classList.add('flipped');
+                playFlipSound();   // play flip sound when card starts turning (0.5s animation)
+            });
+        };
+        img.onerror = function () {
+            requestAnimationFrame(() => {
+                inner.classList.add('flipped');
+                playFlipSound();
+            });
+        };
+        img.src = getCardImageUrl(card.rank, card.suitLetter);
     }
 
     function drawStep() {
         if (!isDuelActive || duelWinner) return;
+        if (drawCount > 52) { gameMessageSpan.innerText = '⚠️ Draw limit reached. Stopping duel.'; stopDrawingAndResetGame(); resetGameVisualsOnly(); return; }
         if (deck.length === 0) { gameMessageSpan.innerText = "Deck empty! Reshuffling."; deck = buildAndShuffleDeck(); deckStatusSpan.innerText = 'Deck: ' + deck.length; }
         const cp = currentTurn === 0 ? selectedPlayer1 : selectedPlayer2;
         if (!cp) { stopDrawingAndResetGame(); return; }
-        const card = deck.pop();
+        const card = deck.pop(); drawCount++;
         deckStatusSpan.innerText = 'Deck: ' + deck.length + ' cards';
         if (currentTurn === 0) renderCardToSlot(p1CardSlot, card); else renderCardToSlot(p2CardSlot, card);
-        playDrawSound();
-        if (card.rank === 'A') {
-            duelWinner = { name: cp.name, side: currentTurn };
-            isDuelActive = false; if (drawTimeout) clearTimeout(drawTimeout);
-            turnStatusSpan.innerText = 'WINNER: ' + cp.name + ' drew an ACE!';
-            gameMessageSpan.innerText = cp.name + ' pulled the ACE! Victory!';
-            if (currentTurn === 0) p1WinnerBadge.innerHTML = '<div class="winner-badge">ACE WINNER</div>';
-            else p2WinnerBadge.innerHTML = '<div class="winner-badge">ACE WINNER</div>';
+        playDrawSound();  // custom draw sound (the card flip begin sound)
+
+        let isWin = false;
+        if (presetWinEnabled && presetCardCode) {
+            if (card.code === presetCardCode) isWin = true;
+        } else {
+            if (card.rank === 'A') isWin = true;
+        }
+
+        if (isWin) {
+            duelWinner = { name: cp.name, side: currentTurn }; isDuelActive = false;
+            if (drawTimeout) clearTimeout(drawTimeout);
+            const winReason = presetWinEnabled ? `drew the preset card ${presetCardCode}!` : 'drew an ACE!';
+            turnStatusSpan.innerText = `WINNER: ${cp.name} ${winReason}`;
+            gameMessageSpan.innerText = `${cp.name} pulled the winning card! Victory!`;
+            if (currentTurn === 0) p1WinnerBadge.innerHTML = '<div class="winner-badge">WINNER</div>'; else p2WinnerBadge.innerHTML = '<div class="winner-badge">WINNER</div>';
             document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active-turn'));
             shootConfetti();
             let wm = [];
             for (let i = 0; i < 2; i++) if (readyCheckPlayers[i] && readyCheckPlayers[i].name === cp.name) wm = readyMessageLogs[i];
             setTimeout(() => showWinnerOverlay(cp.name, wm), 2000);
-            return;
+            drawCount = 0; return;
         }
+
         currentTurn = currentTurn === 0 ? 1 : 0;
         turnStatusSpan.innerText = 'Next: ' + (currentTurn === 0 ? selectedPlayer1.name : selectedPlayer2.name) + ' draws...';
         document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active-turn'));
         const ac = currentTurn === 0 ? $('player1Card') : $('player2Card');
         if (ac) ac.classList.add('active-turn');
-        if (isDuelActive && !duelWinner) drawTimeout = setTimeout(drawStep, 550);
+        if (isDuelActive && !duelWinner) { if (drawTimeout) clearTimeout(drawTimeout); drawTimeout = setTimeout(drawStep, 550); }
     }
 
     function startAceDuel() {
         if (!selectedPlayer1 || !selectedPlayer2) { gameMessageSpan.innerText = "Select two duelists first!"; return; }
         if (isDuelActive) { gameMessageSpan.innerText = "Duel already in progress!"; return; }
         if (drawTimeout) clearTimeout(drawTimeout);
+        drawCount = 0;
         p1WinnerBadge.innerHTML = ''; p2WinnerBadge.innerHTML = '';
-        p1CardSlot.innerHTML = '<div class="card-placeholder">DRAWING...</div>';
-        p2CardSlot.innerHTML = '<div class="card-placeholder">DRAWING...</div>';
+        showCardBack(p1CardSlot);
+        showCardBack(p2CardSlot);
         duelWinner = null; deck = buildAndShuffleDeck(); isDuelActive = true; currentTurn = 0;
-        turnStatusSpan.innerText = 'DUEL START! ' + selectedPlayer1.name + ' draws first...';
+        const winMsg = presetWinEnabled && presetCardCode ? `(winning card: ${presetCardCode})` : '(first Ace wins)';
+        turnStatusSpan.innerText = `DUEL START! ${selectedPlayer1.name} draws first ${winMsg}`;
         deckStatusSpan.innerText = 'Deck: ' + deck.length + ' | SHUFFLED';
         document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active-turn'));
         $('player1Card').classList.add('active-turn');
         drawTimeout = setTimeout(drawStep, 400);
     }
 
-    function resetDuel() { if (drawTimeout) clearTimeout(drawTimeout); isDuelActive = false; duelWinner = null; currentTurn = 0; deck = []; p1CardSlot.innerHTML = '<div class="card-placeholder">READY</div>'; p2CardSlot.innerHTML = '<div class="card-placeholder">READY</div>'; p1WinnerBadge.innerHTML = ''; p2WinnerBadge.innerHTML = ''; turnStatusSpan.innerText = 'Duel reset.'; deckStatusSpan.innerText = 'Deck: 0'; gameMessageSpan.innerText = 'Reset. Press START.'; document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active-turn')); }
+    function resetDuel() { if (drawTimeout) clearTimeout(drawTimeout); isDuelActive = false; duelWinner = null; currentTurn = 0; deck = []; drawCount = 0; showCardBack(p1CardSlot); showCardBack(p2CardSlot); p1WinnerBadge.innerHTML = ''; p2WinnerBadge.innerHTML = ''; turnStatusSpan.innerText = 'Duel reset.'; deckStatusSpan.innerText = 'Deck: 0'; gameMessageSpan.innerText = 'Reset. Press START.'; document.querySelectorAll('.player-card').forEach(c => c.classList.remove('active-turn')); }
     function newDuelSamePlayers() { if (selectedPlayer1 && selectedPlayer2) { resetDuel(); startAceDuel(); } else gameMessageSpan.innerText = "No players selected."; }
     function clearAllParticipants() { if (!confirm("Clear all?")) return; participants = []; selectedPlayer1 = null; selectedPlayer2 = null; renderParticipants(); updateSelectedDisplay(); resetGameVisualsOnly(); startReadyCheckContainer.style.display = 'none'; if (inactivityInterval) { clearInterval(inactivityInterval); inactivityInterval = null; } saveState(); }
     function manualJoin() { const n = participantName.value.trim(); if (!n) return; addParticipant(n); participantName.value = ''; gameMessageSpan.innerText = n + ' joined!'; }
@@ -991,6 +1313,7 @@
     activeSettingsDiv.style.display = 'none';
     modeIndicator.innerText = keyword || '!ace';
     loadState();
+    setTimeout(() => { showCardBack(p1CardSlot); showCardBack(p2CardSlot); }, 100);
 </script>
 </body>
 </html>

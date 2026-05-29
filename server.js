@@ -4,6 +4,7 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const crypto = require('crypto');
+const compression = require('compression');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,8 +12,9 @@ const wss = new WebSocket.Server({ server });
 
 let gameClients = [];
 
+app.use(compression());
 app.use(express.json());
-app.use('/assets', express.static(path.join(__dirname, 'assets')));
+app.use('/assets', express.static(path.join(__dirname, 'assets'), { maxAge: '7d', immutable: true }));
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'game.html'));
