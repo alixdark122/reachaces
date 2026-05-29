@@ -51,9 +51,11 @@
         .participant-time { font-size: 0.7rem; opacity: 0.8; margin-left: 8px; white-space: nowrap; font-family: monospace; }
         .remove-participant { background: #dc2626; border: none; border-radius: 40px; padding: 2px 10px; color: white; cursor: pointer; font-size: 12px; transition: 0.2s; flex-shrink: 0; line-height: 1.4; }
         .remove-participant:hover { transform: scale(1.05); background: #ef4444; }
-        .duel-players { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; }
-        .player-card { background: rgba(15, 23, 42, 0.7); flex: 1; border-radius: 28px; padding: 20px; text-align: center; border: 2px solid rgba(25, 198, 253, 0.3); transition: all 0.2s; backdrop-filter: blur(4px); }
-        .active-turn { border: 3px solid #19C6FD; box-shadow: 0 0 20px rgba(25,198,253,0.5); transform: scale(1.02); background: rgba(30, 41, 59, 0.8); animation: cardGlow 1s infinite; }
+        .duel-players { display: flex; gap: 20px; justify-content: center; margin-bottom: 20px; perspective: 800px; background: radial-gradient(ellipse at 50% 30%, rgba(10, 50, 20, 0.6), rgba(0, 0, 0, 0.3)); border-radius: 60px; padding: 20px 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .player-card { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); flex: 1; border-radius: 28px; padding: 20px; text-align: center; border: 2px solid rgba(25, 198, 253, 0.4); transition: all 0.2s; transform: rotateX(5deg) translateZ(10px); box-shadow: 0 15px 25px -10px rgba(0,0,0,0.5); }
+        .player-card:first-child { transform: rotateX(4deg) rotateY(-2deg) translateZ(8px); }
+        .player-card:last-child { transform: rotateX(4deg) rotateY(4deg) translateZ(8px); }
+        .active-turn { border: 3px solid #19C6FD; box-shadow: 0 0 30px rgba(25,198,253,0.6), 0 10px 20px rgba(0,0,0,0.4); transform: scale(1.02) rotateX(3deg) translateZ(15px); background: rgba(30, 41, 59, 0.9); animation: cardGlow 1s infinite; }
         @keyframes cardGlow { 0% { box-shadow: 0 0 5px #19C6FD; } 50% { box-shadow: 0 0 25px #19C6FD, 0 0 10px #3b82f6; } 100% { box-shadow: 0 0 5px #19C6FD; } }
         .player-name { font-size: 1.5rem; font-weight: 800; font-family: 'Orbitron', monospace; background: linear-gradient(135deg, #19C6FD, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 16px; word-break: break-word; }
         .card-slot { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; min-height: 180px; display: flex; align-items: center; justify-content: center; }
@@ -64,7 +66,6 @@
         .card-placeholder { width: 110px; height: 154px; background: rgba(255,255,255,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8; border: 2px dashed #19C6FD; }
         .card-placeholder.has-back { border: none; background: transparent; padding: 0; }
         @keyframes drawCard { 0% { opacity: 0; transform: translateY(-40px) rotate(-8deg); } 100% { opacity: 1; transform: translateY(0) rotate(0); } }
-        /* Card flip animation - now 0.5 seconds */
         .card-flipper { perspective: 800px; width: 110px; height: 154px; }
         .card-flipper-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s ease-in-out; transform-style: preserve-3d; }
         .card-flipper-inner.flipped { transform: rotateY(180deg); }
@@ -263,16 +264,14 @@
     let drawSound = null;
     let flipSound = null;
     function initAudio() {
-        // Initialize Audio objects only when needed (to respect autoplay policies)
         if (!drawSound) {
-            drawSound = new Audio('/assets/sounds/draw.mp3');   // <-- put your draw sound here
+            drawSound = new Audio('/assets/sounds/draw.mp3');
             drawSound.preload = 'auto';
         }
         if (!flipSound) {
-            flipSound = new Audio('/assets/sounds/flip.mp3');   // <-- put your flip sound here (optional)
+            flipSound = new Audio('/assets/sounds/flip.mp3');
             flipSound.preload = 'auto';
         }
-        // Also resume any previously suspended AudioContext (not needed for HTMLAudioElement)
     }
     function playDrawSound() {
         try {
@@ -281,7 +280,7 @@
                 drawSound.currentTime = 0;
                 drawSound.play().catch(e => console.log('Draw sound error:', e));
             }
-        } catch (e) { /* silent fallback */ }
+        } catch (e) { /* silent */ }
     }
     function playFlipSound() {
         try {
@@ -293,7 +292,6 @@
         } catch (e) { /* silent */ }
     }
     function playDing() {
-        // keep the original ding (synthesized) for player selection – you can also replace with a file if you want
         try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             if (ctx.state === 'suspended') ctx.resume();
@@ -342,17 +340,14 @@
     let currentChannel = null;
     let isLoggedIn = false;
 
-    // Preset winning card
     let presetWinEnabled = false;
     let presetCardCode = '';
     let playerPicksCard = false;
 
-    // Auto-reconnect
     let reconnectTimer = null;
     let reconnectAttempt = 0;
     let manualDisconnect = false;
 
-    // Ready check
     let readyCheckActive = false;
     let readyCheckPlayers = [null, null];
     let readyStatus = [false, false];
@@ -367,7 +362,6 @@
     setInterval(() => { if (stateDirty) { saveState(); stateDirty = false; } }, 2000);
     let drawCount = 0;
 
-    // DOM helpers
     const $ = id => document.getElementById(id);
     const loginBtn = $('loginBtn');
     const channelNameInput = $('channelNameInput');
@@ -690,7 +684,6 @@
         startKickBrowserChat(currentChannel); saveState();
     });
 
-    // ========== TAB VISIBILITY FIX ==========
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) return;
         reconnectAttempt = 0;
@@ -742,27 +735,49 @@
         if (currentMode === 'active') startInactivityChecker(); saveState();
     });
 
-    // ========== INACTIVITY CHECKER ==========
+    // ========== INACTIVITY CHECKER (runs every 2 seconds, removes stale participants) ==========
     function startInactivityChecker() {
         if (inactivityInterval) clearInterval(inactivityInterval);
         inactivityInterval = setInterval(() => {
             if (currentMode !== 'active') return;
-            const now = Date.now(); const timeoutMs = inactivityMinutes * 60 * 1000;
+            // Do not remove participants while a duel is running (to avoid breaking the game)
+            if (isDuelActive) return;
+
+            const now = Date.now();
+            const timeoutMs = inactivityMinutes * 60 * 1000;
             let removed = false;
+
+            // Filter out inactive non‑selected participants
             const newParticipants = participants.filter(p => {
-                if ((selectedPlayer1 && selectedPlayer1.id === p.id) || (selectedPlayer2 && selectedPlayer2.id === p.id)) return true;
-                if ((now - p.lastSeen) > timeoutMs) { removed = true; return false; }
+                const isSelected = (selectedPlayer1 && selectedPlayer1.id === p.id) ||
+                                   (selectedPlayer2 && selectedPlayer2.id === p.id);
+                if (isSelected) return true;
+                const inactive = (now - p.lastSeen) > timeoutMs;
+                if (inactive) {
+                    console.log(`[Inactivity] Removing ${p.name} (last seen ${new Date(p.lastSeen).toLocaleTimeString()}, ${Math.round((now - p.lastSeen)/1000)}s ago, timeout ${inactivityMinutes}min)`);
+                    removed = true;
+                    return false;
+                }
                 return true;
             });
+
             if (removed) {
                 participants = newParticipants;
+                // Clean up selected players if they were removed (should not happen, but safe)
                 if (selectedPlayer1 && !participants.some(p => p.id === selectedPlayer1.id)) selectedPlayer1 = null;
                 if (selectedPlayer2 && !participants.some(p => p.id === selectedPlayer2.id)) selectedPlayer2 = null;
-                renderParticipants(); updateSelectedDisplay(); resetGameVisualsOnly();
+
+                renderParticipants();           // rebuild the participant list (structure changed)
+                updateSelectedDisplay();
+                resetGameVisualsOnly();
+
                 gameMessageSpan.innerText = "Inactive participants removed";
-                setTimeout(() => { if (gameMessageSpan.innerText === "Inactive participants removed") gameMessageSpan.innerText = 'Ready.'; }, 3000); saveState();
+                setTimeout(() => {
+                    if (gameMessageSpan.innerText === "Inactive participants removed") gameMessageSpan.innerText = 'Ready.';
+                }, 3000);
+                saveState();
             }
-        }, 5000);
+        }, 2000); // check every 2 seconds for faster cleanup
     }
 
     // ========== WINNER ==========
@@ -829,10 +844,14 @@
         const p = participants.find(p => p.name.toLowerCase() === name.toLowerCase());
         if (!p) return;
         p.lastSeen = Date.now();
+        // Update the displayed time in the DOM without re‑rendering the whole list
         const item = participantListDiv.querySelector(`.participant-item[data-id="${p.id}"]`);
         if (item && currentMode === 'active') {
             const timeSpan = item.querySelector('.participant-time');
-            if (timeSpan && timeSpan.dataset.lastseen) { timeSpan.dataset.lastseen = p.lastSeen; timeSpan.textContent = `⏱️ ${timeAgo(p.lastSeen)}`; }
+            if (timeSpan && timeSpan.dataset.lastseen) {
+                timeSpan.dataset.lastseen = p.lastSeen;
+                timeSpan.textContent = `⏱️ ${timeAgo(p.lastSeen)}`;
+            }
         }
         markStateDirty();
     }
@@ -1162,7 +1181,7 @@
         input.focus();
     }
 
-    // ========== DUEL with custom flip sound and 0.5s flip ==========
+    // ========== DUEL ==========
     function buildAndShuffleDeck() {
         let d = [];
         for (const s of allSuits) for (const r of allRanks) d.push({ rank: r, suitLetter: s, display: r + suitFull[s], code: r + s });
@@ -1213,7 +1232,7 @@
             front.appendChild(img);
             requestAnimationFrame(() => {
                 inner.classList.add('flipped');
-                playFlipSound();   // play flip sound when card starts turning (0.5s animation)
+                playFlipSound();
             });
         };
         img.onerror = function () {
@@ -1234,7 +1253,7 @@
         const card = deck.pop(); drawCount++;
         deckStatusSpan.innerText = 'Deck: ' + deck.length + ' cards';
         if (currentTurn === 0) renderCardToSlot(p1CardSlot, card); else renderCardToSlot(p2CardSlot, card);
-        playDrawSound();  // custom draw sound (the card flip begin sound)
+        playDrawSound();
 
         let isWin = false;
         if (presetWinEnabled && presetCardCode) {
